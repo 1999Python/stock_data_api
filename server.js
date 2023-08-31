@@ -11,17 +11,31 @@ app.use(express.json())
 app.use(require('cors')())
 
 //routes
+
 app.get('/', (req, res) =>{
 res.status(200).send({ message : 'Thank you for trying our API'})
 })
 
-app.get('/api/stock', (req, res) =>{
+app.get('/api/stock', async (req, res) =>{
     const { stock } = req.query
+
     if (!stock){
         return res.sendStatus(403)
     }
 
-    const stockDataURL = baseURL = stock
+    try{
+        const stockDataURL = baseUrl(stock)
+        const res = await fetch (stockDataURL)
+        const $ = cheerio.load(res)
+        console.log($.html())
+        res.sendStatus(200)
+    }
+    catch(err) {
+        console.log('THERE WAS AN ERROR', err)
+        res.sendStatus(500)
+    }
+
+   
 })
 
 app.post('/test', (req, res) =>{
